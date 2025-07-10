@@ -1,8 +1,6 @@
-package main
+package color
 
-import (
-	"fmt"
-)
+import "fmt"
 
 func Black(text string) string {
 	return Style(text, AttrFgBlack)

@@ -1,7 +1,6 @@
-package main
+package color
 
 import (
-	"fmt"
 	"os"
 	"slices"
 	"sort"
@@ -11,10 +10,6 @@ import (
 )
 
 type Attr int
-
-type CacheKey interface {
-	Attr | string
-}
 
 var (
 	NoColor    bool
@@ -40,35 +35,12 @@ func init() {
 	}
 }
 
-func main() {
-	// Простые функции для цветов
-	fmt.Println(Red("Ошибка: файл не найден"))
-	fmt.Println(Green("Успешно завершено"))
-	fmt.Println(Yellow("Предупреждение: устаревший метод"))
-	fmt.Println(Blue("Информация: обработано 100 файлов"))
-
-	// Яркие варианты цветов
-	fmt.Println(BrightRed("КРИТИЧЕСКАЯ ОШИБКА"))
-	fmt.Println(BrightGreen("ТЕСТЫ ПРОЙДЕНЫ"))
-	fmt.Println(BrightYellow("ВНИМАНИЕ"))
-
-	// Комбинирование стилей
-	fmt.Println(Style("Важная ошибка", AttrFgRed, AttrBold))
-	fmt.Println(Style("Успех!", AttrFgGreen, AttrBold, AttrUnderline))
-	fmt.Println(Style("Предупреждение", AttrFgYellow, AttrItalic))
-	fmt.Println(Style("Критично", AttrFgWhite, AttrBgRed, AttrBold))
-	fmt.Println(Style("Информация", AttrFgBlack, AttrBgBrightCyan))
-
-	arr := []string{"lol", "qwe"}
-	fmt.Print(slices.Contains(arr, "qwe"))
-}
-
 func Style(text string, attrs ...Attr) string {
 	if !allowColor() {
 		return text
 	}
 
-	if len(attrs) == 0 {
+	if len(attrs) == 0 || text == "" {
 		return text
 	}
 
@@ -148,6 +120,7 @@ func getComplexAnsi(text string, attrs ...Attr) string {
 
 func buildAnsi(text string, cachedAttrs string, attrs ...Attr) string {
 	var sb strings.Builder
+
 	sb.WriteString(start)
 
 	if cachedAttrs != "" {
@@ -168,16 +141,21 @@ func makeAttrSeq(attrs ...Attr) string {
 		return ""
 	}
 
-	separator := ";"
 	strAttrs := make([]string, 0, len(attrs))
 
 	for _, attr := range attrs {
 		strAttrs = append(strAttrs, strconv.Itoa(ansiCodes[attr]))
 	}
 
-	sort.Strings(strAttrs)
+	sort.Slice(strAttrs, func(i, j int) bool {
+		a, _ := strconv.Atoi(strAttrs[i])
+		b, _ := strconv.Atoi(strAttrs[j])
+		return a < b
+	})
 
-	return strings.Join(strAttrs, separator)
+	filtered := slices.Compact(strAttrs)
+
+	return strings.Join(filtered, ";")
 }
 
 func checkCache(cache []string, key string) (string, bool) {
@@ -186,7 +164,6 @@ func checkCache(cache []string, key string) (string, bool) {
 	if idx == -1 {
 		return "", false
 	} else {
-
 		return cache[idx], true
 	}
 }

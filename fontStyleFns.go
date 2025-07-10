@@ -1,4 +1,4 @@
-package main
+package color
 
 func Bold(text string) string {
 	return Style(text, AttrBold)
