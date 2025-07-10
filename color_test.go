@@ -125,14 +125,47 @@ func TestCaching(t *testing.T) {
 	Style("test", AttrFgRed, AttrBold)
 
 	singleAttrMu.RLock()
-	defer singleAttrMu.RUnlock()
 	if !slices.Contains(singleAttrCache, "1") {
 		t.Error("Expected '1' (Bold) in singleAttrCache")
 	}
+	singleAttrMu.RUnlock()
 
 	comboAttrMu.RLock()
-	defer comboAttrMu.RUnlock()
 	if !slices.Contains(comboAttrCache, "1;31") {
 		t.Error("Expected '1;31' (Bold+Red) in comboAttrCache")
 	}
+	comboAttrMu.RUnlock()
 }
+
+func TestMakeAttrSeq(t *testing.T) {
+	tests := []struct {
+		name  string
+		input []Attr
+		want  string
+	}{
+		{
+			name:  "emty argument",
+			input: []Attr{},
+			want:  "",
+		},
+		{
+			name:  "classic example",
+			input: []Attr{AttrBgBlack, AttrFgBrightGreen},
+			want:  "40;92",
+		},
+		{
+			name:  "mix attributes and check sorting",
+			input: []Attr{AttrBgBrightCyan, AttrFgBrightRed, AttrUnderline},
+			want:  "4;91;106",
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			result := makeAttrSeq(tc.input...)
+			assert.Equal(t, tc.want, result)
+		})
+	}
+}
+
+
