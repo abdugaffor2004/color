@@ -173,20 +173,6 @@ const (
 - `NoColor bool` - Disable all colors (also controlled by NO_COLOR env var)
 - `ForceColor bool` - Force colors even in non-TTY (also controlled by FORCE_COLOR env var)
 
-
-## Color Reference
-
-| Input | Output |
-|-------|--------|
-| `color.Red("text")` | <span style="color: red;">text</span> |
-| `color.Green("text")` | <span style="color: green;">text</span> |
-| `color.Yellow("text")` | <span style="color: yellow;">text</span> |
-| `color.Blue("text")` | <span style="color: blue;">text</span> |
-| `color.BrightRed("text")` | <span style="color: #ff6b6b;">text</span> |
-| `color.BgRed("text")` | <span style="background-color: red; color: white;">text</span> |
-| `color.Bold("text")` | <span style="font-weight: bold;">text</span> |
-| `color.Style("text", color.AttrFgRed, color.AttrBold)` | <span style="color: red; font-weight: bold;">text</span> |
-
 ## Environment Variables
 
 - `NO_COLOR=1` - Disable all colors (follows [no-color.org](https://no-color.org/) standard)
