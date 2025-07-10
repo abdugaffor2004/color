@@ -9,10 +9,16 @@ import (
 	"sync"
 )
 
+// Attr represents a text style attribute such as color, bold, italic, etc.
 type Attr int
 
 var (
-	NoColor    bool
+	// NoColor disables color output if set to true.
+	// This can be controlled via the NO_COLOR environment variable.
+	NoColor bool
+
+	// ForceColor forces color output, its ignore terminal support check.
+	// This can be controlled via the FORCE_COLOR environment variable.
 	ForceColor bool
 
 	singleAttrCache = []string{}
@@ -35,6 +41,7 @@ func init() {
 	}
 }
 
+// Style applies the given attributes to the text and returns the styled string.
 func Style(text string, attrs ...Attr) string {
 	if !allowColor() {
 		return text
@@ -63,12 +70,15 @@ func allowColor() bool {
 	return IsTerminal() && SupportsColor()
 }
 
+// IsTerminal reports whether the standard output is connected to a terminal (TTY).
 func IsTerminal() bool {
 	fileInfo, _ := os.Stdout.Stat()
 
 	return (fileInfo.Mode() & os.ModeCharDevice) == os.ModeCharDevice
 }
 
+// SupportsColor reports whether the current environment supports color output,
+// based on the TERM and COLORTERM environment variables.
 func SupportsColor() bool {
 	term := os.Getenv("TERM")
 	if term == "" {
