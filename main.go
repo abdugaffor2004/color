@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"slices"
 	"sort"
 	"strconv"
 	"strings"
@@ -11,14 +12,18 @@ import (
 
 type Attr int
 
+type CacheKey interface {
+	Attr | string
+}
+
 var (
 	NoColor    bool
 	ForceColor bool
 
-	singleAttrCache = make(map[Attr]string)
+	singleAttrCache = []string{}
 	singleAttrMu    sync.RWMutex
 
-	comboAttrCache = make(map[string]string)
+	comboAttrCache = []string{}
 	comboAttrMu    sync.RWMutex
 
 	start = "\x1b["
@@ -53,6 +58,9 @@ func main() {
 	fmt.Println(Style("Предупреждение", AttrFgYellow, AttrItalic))
 	fmt.Println(Style("Критично", AttrFgWhite, AttrBgRed, AttrBold))
 	fmt.Println(Style("Информация", AttrFgBlack, AttrBgBrightCyan))
+
+	arr := []string{"lol", "qwe"}
+	fmt.Print(slices.Contains(arr, "qwe"))
 }
 
 func Style(text string, attrs ...Attr) string {
@@ -104,71 +112,63 @@ func SupportsColor() bool {
 
 func getAnsi(text string, attr Attr) string {
 	ansi := ansiCodes[attr]
+	cacheKey := strconv.Itoa(ansi)
 
 	singleAttrMu.RLock()
-	ansiSeq, ok := singleAttrCache[Attr(ansi)]
+	cached, ok := checkCache(singleAttrCache, cacheKey)
 	singleAttrMu.RUnlock()
 
-	if ok {
-		return ansiSeq
+	if !ok {
+		singleAttrMu.Lock()
+		singleAttrCache = append(singleAttrCache, cacheKey)
+		singleAttrMu.Unlock()
 	}
 
-	var sb strings.Builder
-
-	sb.WriteString(start)
-	sb.WriteString(strconv.Itoa(ansi))
-	sb.WriteByte('m')
-	sb.WriteString(text)
-	sb.WriteString(end)
-	seq := sb.String()
-
-	singleAttrMu.Lock()
-	singleAttrCache[Attr(ansi)] = seq
-	singleAttrMu.Unlock()
-
-	return seq
+	return buildAnsi(text, cached, attr)
 }
 
 func getComplexAnsi(text string, attrs ...Attr) string {
 	if len(attrs) == 0 {
-		return ""
+		return text
 	}
 
-	key := makeAttrSeq(",", attrs...)
-
+	cacheKey := makeAttrSeq(attrs...)
 	comboAttrMu.RLock()
-	comboAnsiSeq, ok := comboAttrCache[key]
+	cached, ok := checkCache(comboAttrCache, cacheKey)
 	comboAttrMu.RUnlock()
 
-	if ok {
-		return comboAnsiSeq
+	if !ok {
+		comboAttrMu.Lock()
+		comboAttrCache = append(comboAttrCache, cacheKey)
+		comboAttrMu.Unlock()
 	}
 
-	var sb strings.Builder
+	return buildAnsi(text, cached, attrs...)
+}
 
+func buildAnsi(text string, cachedAttrs string, attrs ...Attr) string {
+	var sb strings.Builder
 	sb.WriteString(start)
-	sb.WriteString(makeAttrSeq(";", attrs...))
+
+	if cachedAttrs != "" {
+		sb.WriteString(cachedAttrs)
+	} else {
+		sb.WriteString(makeAttrSeq(attrs...))
+	}
+
 	sb.WriteByte('m')
 	sb.WriteString(text)
 	sb.WriteString(end)
-	seq := sb.String()
 
-	comboAttrMu.Lock()
-	comboAttrCache[key] = seq
-	comboAttrMu.Unlock()
-
-	return seq
+	return sb.String()
 }
 
-func makeAttrSeq(separator string, attrs ...Attr) string {
+func makeAttrSeq(attrs ...Attr) string {
 	if len(attrs) == 0 {
 		return ""
 	}
 
-	if separator == "" {
-		separator = ","
-	}
-
+	separator := ";"
 	strAttrs := make([]string, 0, len(attrs))
 
 	for _, attr := range attrs {
@@ -178,4 +178,15 @@ func makeAttrSeq(separator string, attrs ...Attr) string {
 	sort.Strings(strAttrs)
 
 	return strings.Join(strAttrs, separator)
+}
+
+func checkCache(cache []string, key string) (string, bool) {
+	idx := slices.Index(cache, key)
+
+	if idx == -1 {
+		return "", false
+	} else {
+
+		return cache[idx], true
+	}
 }
