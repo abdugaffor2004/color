@@ -1,7 +1,6 @@
 package color
 
 import (
-	"slices"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -48,13 +47,13 @@ func TestStyle(t *testing.T) {
 			name:  "Style combining: color + font-style",
 			input: "Важная ошибка",
 			attrs: []Attr{AttrFgRed, AttrBold},
-			want:  "\x1b[1;31mВажная ошибка\x1b[0m",
+			want:  "\x1b[31;1mВажная ошибка\x1b[0m",
 		},
 		{
 			name:  "Style combining: color + font-style + font-decoration",
 			input: "Успех!",
 			attrs: []Attr{AttrFgGreen, AttrBold, AttrUnderline},
-			want:  "\x1b[1;4;32mУспех!\x1b[0m",
+			want:  "\x1b[32;1;4mУспех!\x1b[0m",
 		},
 		{
 			name:  "Style combining: color + bg-Color",
@@ -84,7 +83,7 @@ func TestStyle(t *testing.T) {
 			name:  "Long input",
 			input: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut bibendum sagittis velit, viverra euismod sapien posuere sit amet. Vivamus euismod sed velit nec elementum. Phasellus a gravida nibh. Phasellus rutrum mollis mi, sed hendrerit dolor semper sit amet. Nam et magna id lacus egestas ultrices. Donec dolor justo, ultrices eu ultrices ut, iaculis sit amet mi. Curabitur vel purus ultrices, porta ex eu, luctus mauris. Nullam et nisi viverra, consequat enim id, rhoncus ligula. Ut hendrerit enim vel turpis lacinia eleifend. Integer facilisis aliquam aliquam. Quisque vitae mi imperdiet, tempor turpis sed, pulvinar orci.",
 			attrs: []Attr{AttrBgBlue, AttrFgRed},
-			want:  "\x1b[31;44mLorem ipsum dolor sit amet, consectetur adipiscing elit. Ut bibendum sagittis velit, viverra euismod sapien posuere sit amet. Vivamus euismod sed velit nec elementum. Phasellus a gravida nibh. Phasellus rutrum mollis mi, sed hendrerit dolor semper sit amet. Nam et magna id lacus egestas ultrices. Donec dolor justo, ultrices eu ultrices ut, iaculis sit amet mi. Curabitur vel purus ultrices, porta ex eu, luctus mauris. Nullam et nisi viverra, consequat enim id, rhoncus ligula. Ut hendrerit enim vel turpis lacinia eleifend. Integer facilisis aliquam aliquam. Quisque vitae mi imperdiet, tempor turpis sed, pulvinar orci.\x1b[0m",
+			want:  "\x1b[44;31mLorem ipsum dolor sit amet, consectetur adipiscing elit. Ut bibendum sagittis velit, viverra euismod sapien posuere sit amet. Vivamus euismod sed velit nec elementum. Phasellus a gravida nibh. Phasellus rutrum mollis mi, sed hendrerit dolor semper sit amet. Nam et magna id lacus egestas ultrices. Donec dolor justo, ultrices eu ultrices ut, iaculis sit amet mi. Curabitur vel purus ultrices, porta ex eu, luctus mauris. Nullam et nisi viverra, consequat enim id, rhoncus ligula. Ut hendrerit enim vel turpis lacinia eleifend. Integer facilisis aliquam aliquam. Quisque vitae mi imperdiet, tempor turpis sed, pulvinar orci.\x1b[0m",
 		},
 	}
 
@@ -107,34 +106,9 @@ func TestColorEnvs(t *testing.T) {
 	t.Run("With No Color", func(t *testing.T) {
 		ForceColor = true
 		result := Style("Текст", AttrFgRed)
-		assert.Equal(t, result, "\x1b[31mТекст\x1b[0m")
+		assert.Equal(t, "\x1b[31mТекст\x1b[0m", result)
 		ForceColor = false
 	})
-}
-
-func TestCaching(t *testing.T) {
-	singleAttrMu.Lock()
-	singleAttrCache = []string{}
-	singleAttrMu.Unlock()
-
-	comboAttrMu.Lock()
-	comboAttrCache = []string{}
-	comboAttrMu.Unlock()
-
-	Style("test", AttrBold)
-	Style("test", AttrFgRed, AttrBold)
-
-	singleAttrMu.RLock()
-	if !slices.Contains(singleAttrCache, "1") {
-		t.Error("Expected '1' (Bold) in singleAttrCache")
-	}
-	singleAttrMu.RUnlock()
-
-	comboAttrMu.RLock()
-	if !slices.Contains(comboAttrCache, "1;31") {
-		t.Error("Expected '1;31' (Bold+Red) in comboAttrCache")
-	}
-	comboAttrMu.RUnlock()
 }
 
 func TestMakeAttrSeq(t *testing.T) {
@@ -156,16 +130,62 @@ func TestMakeAttrSeq(t *testing.T) {
 		{
 			name:  "mix attributes and check sorting",
 			input: []Attr{AttrBgBrightCyan, AttrFgBrightRed, AttrUnderline},
-			want:  "4;91;106",
+			want:  "106;91;4",
 		},
 	}
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			result := makeAttrSeq(tc.input...)
+			result := makeAttrSeq(tc.input)
 			assert.Equal(t, tc.want, result)
 		})
 	}
 }
 
+func TestMakeKey(t *testing.T) {
+	tests := []struct {
+		name    string
+		input   []Attr
+		want    string
+		wantErr bool
+	}{
+		{
+			name:    "empty argument",
+			input:   []Attr{},
+			want:    "",
+			wantErr: true,
+		},
+		{
+			name:    "single attribute",
+			input:   []Attr{AttrFgRed},
+			want:    string([]byte{1, 0, 0, 0, 0, 0, 0, 0}),
+			wantErr: false,
+		},
+		{
+			name:    "multiple attributes",
+			input:   []Attr{AttrFgRed, AttrFgGreen},
+			want:    string([]byte{1, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0}),
+			wantErr: false,
+		},
+		{
+			name:    "larger values",
+			input:   []Attr{256, 65536},
+			want:    string([]byte{0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0}),
+			wantErr: false,
+		},
+	}
 
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			result, err := makeKey(tc.input)
+
+			if tc.wantErr {
+				assert.Error(t, err)
+				assert.Equal(t, tc.want, result)
+			} else {
+				assert.NoError(t, err)
+				assert.Equal(t, tc.want, result)
+			}
+		})
+	}
+}

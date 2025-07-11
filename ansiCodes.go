@@ -1,5 +1,8 @@
 package color
 
+// Attr represents a text style attribute such as color, bold, italic, etc.
+type Attr int
+
 const (
 	AttrFgBlack Attr = iota
 	AttrFgRed

@@ -1,4 +1,4 @@
-module github.com/abdugaffor2004/Terminal-Color
+module github.com/haadi-coder/Terminal-Color
 
 go 1.24.4
 
