@@ -15,7 +15,7 @@ A lightweight Go package for colorful and styled terminal output with ANSI escap
 ## Installation
 
 ```bash
-go get github.com/abdugaffor2004/terminal-color
+go get github.com/haadi-coder/color
 ```
 
 ## Usage
@@ -27,7 +27,7 @@ package main
 
 import (
     "fmt"
-    "github.com/abdugaffor2004/terminal-color"
+    "github.com/haadi-coder/color"
 )
 
 func main() {
