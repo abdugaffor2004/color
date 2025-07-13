@@ -189,3 +189,45 @@ func TestMakeKey(t *testing.T) {
 		})
 	}
 }
+
+func TestCache(t *testing.T) {
+
+	tests := []struct {
+		name    string
+		attrs   []Attr
+		seq     string
+		isFound bool
+	}{
+		{
+			name:    "Zero attrs",
+			attrs:   []Attr{},
+			seq:     "",
+			isFound: false,
+		},
+		{
+			name:    "one attr",
+			attrs:   []Attr{AttrBgBlue},
+			seq:     makeStartSeq([]Attr{AttrBgBlue}),
+			isFound: true,
+		},
+		{
+			name:    "more attrs",
+			attrs:   []Attr{AttrBgGreen, AttrFgBrightYellow, AttrItalic},
+			seq:     makeStartSeq([]Attr{AttrBgGreen, AttrFgBrightYellow, AttrItalic}),
+			isFound: true,
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			cache := newCache()
+
+			cache.Set(tc.attrs, tc.seq)
+			seq, found := cache.Get(tc.attrs)
+
+			assert.Equal(t, tc.isFound, found)
+			assert.Equal(t, tc.seq, seq)
+		})
+	}
+
+}
