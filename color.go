@@ -6,6 +6,11 @@ import (
 	"strings"
 )
 
+const (
+	seqPref = "\x1b["
+	endSeq  = "\x1b[0m"
+)
+
 // Style applies the given attributes to the text and returns the styled string.
 func Style(text string, attrs ...Attr) string {
 	if !allowColor() {
@@ -16,14 +21,13 @@ func Style(text string, attrs ...Attr) string {
 		return text
 	}
 
-	startSeq, ok := ansiCache.Get(attrs)
+	startSeq, ok := ac.get(attrs)
 	if !ok {
 		startSeq = makeStartSeq(attrs)
-		ansiCache.Set(attrs, startSeq)
+		ac.set(attrs, startSeq)
 	}
 
 	var sb strings.Builder
-	endSeq := "\x1b[0m"
 
 	sb.WriteString(startSeq)
 	sb.WriteString(text)
@@ -35,7 +39,7 @@ func Style(text string, attrs ...Attr) string {
 func makeStartSeq(attrs []Attr) string {
 	var sb strings.Builder
 
-	sb.WriteString("\x1b[")
+	sb.WriteString(seqPref)
 	sb.WriteString(makeAttrSeq(attrs))
 	sb.WriteByte('m')
 
@@ -47,13 +51,12 @@ func makeAttrSeq(attrs []Attr) string {
 		return ""
 	}
 
-	strAttrs := make([]string, len(attrs))
+	compacted := slices.Compact(attrs)
+	strAttrs := make([]string, len(compacted))
 
-	for i, attr := range attrs {
+	for i, attr := range compacted {
 		strAttrs[i] = strconv.Itoa(ansiCodes[attr])
 	}
 
-	filtered := slices.Compact(strAttrs)
-
-	return strings.Join(filtered, ";")
+	return strings.Join(strAttrs, ";")
 }

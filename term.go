@@ -1,6 +1,11 @@
 package color
 
-import "os"
+import (
+	"os"
+	"strconv"
+
+	"golang.org/x/term"
+)
 
 var (
 	// NoColor disables color output if set to true.
@@ -13,11 +18,11 @@ var (
 )
 
 func init() {
-	if os.Getenv("NO_COLOR") != "" {
+	if b, err := strconv.ParseBool(os.Getenv("NO_COLOR")); b && err == nil {
 		NoColor = true
 	}
 
-	if os.Getenv("FORCE_COLOR") != "" {
+	if b, err := strconv.ParseBool(os.Getenv("FORCE_COLOR")); b && err == nil {
 		ForceColor = true
 	}
 }
@@ -36,16 +41,14 @@ func allowColor() bool {
 
 // IsTerminal reports whether the standard output is connected to a terminal (TTY).
 func IsTerminal() bool {
-	fileInfo, _ := os.Stdout.Stat()
-
-	return (fileInfo.Mode() & os.ModeCharDevice) == os.ModeCharDevice
+	return term.IsTerminal(int(os.Stdout.Fd()))
 }
 
 // SupportsColor reports whether the current environment supports color output,
 // based on the TERM and COLORTERM environment variables.
 func SupportsColor() bool {
 	term := os.Getenv("TERM")
-	if term == "" {
+	if term == "dumb" {
 		return false
 	}
 
