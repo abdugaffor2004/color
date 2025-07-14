@@ -49,7 +49,7 @@ func IsTerminal() bool {
 // based on the TERM and COLORTERM environment variables.
 func SupportsColor() bool {
 	term := os.Getenv("TERM")
-	if term == "dumb" {
+	if term == "dumb" || term == "" {
 		return false
 	}
 
