@@ -2,7 +2,7 @@ package color
 
 import (
 	"encoding/binary"
-	"sort"
+	"slices"
 	"sync"
 )
 
@@ -35,7 +35,6 @@ func (c *cache) set(attrs []Attr, seq string) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	c.seqs[key] = seq
-
 }
 
 func makeKey(attrs []Attr) string {
@@ -50,9 +49,7 @@ func makeKey(attrs []Attr) string {
 		intAttrs[i] = uint64(atrr)
 	}
 
-	sort.Slice(intAttrs, func(i, j int) bool {
-		return intAttrs[i] < intAttrs[j]
-	})
+	slices.Sort(intAttrs)
 
 	for _, b := range intAttrs {
 		buff = binary.LittleEndian.AppendUint64(buff, b)

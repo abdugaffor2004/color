@@ -49,7 +49,6 @@ func TestMakeKey(t *testing.T) {
 }
 
 func TestCache(t *testing.T) {
-
 	tests := []struct {
 		name    string
 		attrs   []Attr
@@ -87,5 +86,4 @@ func TestCache(t *testing.T) {
 			assert.Equal(t, tc.seq, seq)
 		})
 	}
-
 }
