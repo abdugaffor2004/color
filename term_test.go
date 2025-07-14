@@ -76,6 +76,16 @@ func TestSupportsColor(t *testing.T) {
 		reset        func()
 	}{
 		{
+			name: "COLORTERM",
+			want: true,
+			setup: func() {
+				_ = os.Setenv("COLORTERM", "xterm256")
+			},
+			reset: func() {
+				_ = os.Unsetenv("COLORTERM")
+			},
+		},
+		{
 			name: "TERM=dumb",
 			want: false,
 			setup: func() {
@@ -97,9 +107,8 @@ func TestSupportsColor(t *testing.T) {
 			},
 		},
 		{
-			name:    "TERM=xterm-256color",
-			termEnv: "xterm-256color",
-			want:    true,
+			name: "TERM=xterm-256color",
+			want: true,
 			setup: func() {
 				_ = os.Setenv("TERM", "xterm-256color")
 			},
@@ -108,9 +117,8 @@ func TestSupportsColor(t *testing.T) {
 			},
 		},
 		{
-			name:    "TERM=screen",
-			termEnv: "screen",
-			want:    true,
+			name: "TERM=screen",
+			want: true,
 			setup: func() {
 				_ = os.Setenv("TERM", "screen")
 			},
@@ -119,20 +127,8 @@ func TestSupportsColor(t *testing.T) {
 			},
 		},
 		{
-			name:    "TERM contains 'xterm'",
-			termEnv: "my-xterm-compatible",
-			want:    true,
-			setup: func() {
-				_ = os.Setenv("TERM", "xterm")
-			},
-			reset: func() {
-				_ = os.Unsetenv("TERM")
-			},
-		},
-		{
-			name:    "TERM=linux",
-			termEnv: "linux",
-			want:    true,
+			name: "TERM=linux",
+			want: true,
 			setup: func() {
 				_ = os.Setenv("TERM", "linux")
 
