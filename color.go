@@ -7,8 +7,8 @@ import (
 )
 
 const (
-	seqPref = "\x1b["
-	endSeq  = "\x1b[0m"
+	startSeqPref = "\x1b["
+	endSeq       = "\x1b[0m"
 )
 
 // Style applies the given attributes to the text and returns the styled string.
@@ -28,7 +28,6 @@ func Style(text string, attrs ...Attr) string {
 	}
 
 	var sb strings.Builder
-
 	sb.WriteString(startSeq)
 	sb.WriteString(text)
 	sb.WriteString(endSeq)
@@ -38,8 +37,7 @@ func Style(text string, attrs ...Attr) string {
 
 func makeStartSeq(attrs []Attr) string {
 	var sb strings.Builder
-
-	sb.WriteString(seqPref)
+	sb.WriteString(startSeqPref)
 	sb.WriteString(makeAttrSeq(attrs))
 	sb.WriteByte('m')
 

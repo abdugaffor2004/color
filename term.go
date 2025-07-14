@@ -2,8 +2,8 @@ package color
 
 import (
 	"os"
+	"slices"
 	"strconv"
-	"strings"
 
 	"golang.org/x/term"
 )
@@ -19,10 +19,10 @@ var (
 )
 
 func init() {
-	initialize()
+	initFlags()
 }
 
-func initialize() {
+func initFlags() {
 	if b, err := strconv.ParseBool(os.Getenv("NO_COLOR")); b && err == nil {
 		NoColor = true
 	}
@@ -66,11 +66,5 @@ func SupportsColor() bool {
 		"color", "linux", "cygwin", "putty", "konsole", "gnome",
 	}
 
-	for _, ct := range colorTerms {
-		if strings.Contains(term, ct) {
-			return true
-		}
-	}
-
-	return false
+	return slices.Contains(colorTerms, term)
 }

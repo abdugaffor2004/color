@@ -8,25 +8,24 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestInit(t *testing.T) {
-
+func TestInitFlags(t *testing.T) {
 	tests := []struct {
 		name           string
 		noColorEnv     string
 		forceColorEnv  string
 		wantNoColor    bool
 		wantForceColor bool
-		setUp          func()
-		reset          func()
+		setup          func()
+		cleanup        func()
 	}{
 		{
 			name:           "NO_COLOR enabled",
 			wantNoColor:    true,
 			wantForceColor: false,
-			setUp: func() {
+			setup: func() {
 				_ = os.Setenv("NO_COLOR", "true")
 			},
-			reset: func() {
+			cleanup: func() {
 				_ = os.Unsetenv("NO_COLOR")
 				NoColor = false
 			},
@@ -35,10 +34,10 @@ func TestInit(t *testing.T) {
 			name:           "FORCE_COLOR enabled",
 			wantNoColor:    false,
 			wantForceColor: true,
-			setUp: func() {
+			setup: func() {
 				_ = os.Setenv("FORCE_COLOR", "true")
 			},
-			reset: func() {
+			cleanup: func() {
 				_ = os.Unsetenv("FORCE_COLOR")
 				ForceColor = false
 			},
@@ -47,21 +46,21 @@ func TestInit(t *testing.T) {
 			name:           "both disabled",
 			wantNoColor:    false,
 			wantForceColor: false,
-			setUp:          func() {},
-			reset:          func() {},
+			setup:          func() {},
+			cleanup:        func() {},
 		},
 	}
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			tc.setUp()
+			tc.setup()
 
-			initialize()
+			initFlags()
 
 			assert.Equal(t, tc.wantNoColor, NoColor)
 			assert.Equal(t, tc.wantForceColor, ForceColor)
 
-			tc.reset()
+			tc.cleanup()
 		})
 	}
 }
@@ -73,7 +72,7 @@ func TestSupportsColor(t *testing.T) {
 		colorTermEnv string
 		want         bool
 		setup        func()
-		reset        func()
+		cleanup      func()
 	}{
 		{
 			name: "COLORTERM",
@@ -81,7 +80,7 @@ func TestSupportsColor(t *testing.T) {
 			setup: func() {
 				_ = os.Setenv("COLORTERM", "xterm256")
 			},
-			reset: func() {
+			cleanup: func() {
 				_ = os.Unsetenv("COLORTERM")
 			},
 		},
@@ -91,7 +90,7 @@ func TestSupportsColor(t *testing.T) {
 			setup: func() {
 				_ = os.Setenv("TERM", "dumb")
 			},
-			reset: func() {
+			cleanup: func() {
 				_ = os.Unsetenv("TERM")
 			},
 		},
@@ -102,7 +101,7 @@ func TestSupportsColor(t *testing.T) {
 			setup: func() {
 				_ = os.Setenv("TERM", "")
 			},
-			reset: func() {
+			cleanup: func() {
 				_ = os.Unsetenv("TERM")
 			},
 		},
@@ -112,7 +111,7 @@ func TestSupportsColor(t *testing.T) {
 			setup: func() {
 				_ = os.Setenv("TERM", "xterm-256color")
 			},
-			reset: func() {
+			cleanup: func() {
 				_ = os.Unsetenv("TERM")
 			},
 		},
@@ -122,7 +121,7 @@ func TestSupportsColor(t *testing.T) {
 			setup: func() {
 				_ = os.Setenv("TERM", "screen")
 			},
-			reset: func() {
+			cleanup: func() {
 				_ = os.Unsetenv("TERM")
 			},
 		},
@@ -133,7 +132,7 @@ func TestSupportsColor(t *testing.T) {
 				_ = os.Setenv("TERM", "linux")
 
 			},
-			reset: func() {
+			cleanup: func() {
 				_ = os.Unsetenv("TERM")
 			},
 		},
@@ -145,7 +144,7 @@ func TestSupportsColor(t *testing.T) {
 			result := SupportsColor()
 
 			assert.Equal(t, tc.want, result)
-			tc.reset()
+			tc.cleanup()
 		})
 	}
 }

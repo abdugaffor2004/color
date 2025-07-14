@@ -15,7 +15,7 @@ type cache struct {
 
 func newCache() *cache {
 	return &cache{
-		seqs: make(map[string]string, 0),
+		seqs: make(map[string]string),
 	}
 }
 
@@ -43,7 +43,6 @@ func makeKey(attrs []Attr) string {
 	}
 
 	intAttrs := make([]uint64, len(attrs))
-	buff := make([]byte, 0, len(attrs))
 
 	for i, atrr := range attrs {
 		intAttrs[i] = uint64(atrr)
@@ -51,9 +50,10 @@ func makeKey(attrs []Attr) string {
 
 	slices.Sort(intAttrs)
 
+	buf := make([]byte, 0, len(attrs))
 	for _, b := range intAttrs {
-		buff = binary.LittleEndian.AppendUint64(buff, b)
+		buf = binary.LittleEndian.AppendUint64(buf, b)
 	}
 
-	return string(buff)
+	return string(buf)
 }
