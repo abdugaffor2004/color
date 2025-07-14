@@ -2,7 +2,6 @@ package color
 
 import (
 	"encoding/binary"
-	"errors"
 	"sort"
 	"sync"
 )
@@ -10,56 +9,54 @@ import (
 var ac = newCache()
 
 type cache struct {
-	items map[string]string
-	mu    sync.RWMutex
+	seqs map[string]string
+	mu   sync.RWMutex
 }
 
 func newCache() *cache {
 	return &cache{
-		items: make(map[string]string, 0),
+		seqs: make(map[string]string, 0),
 	}
 }
 
 func (c *cache) get(attrs []Attr) (string, bool) {
-	key, err := makeKey(attrs)
-	if err != nil {
-		return "", false
-	}
+	key := makeKey(attrs)
 
 	c.mu.RLock()
 	defer c.mu.RUnlock()
-	value, found := c.items[key]
+	value, found := c.seqs[key]
 
 	return value, found
 }
 
 func (c *cache) set(attrs []Attr, seq string) {
-	key, err := makeKey(attrs)
+	key := makeKey(attrs)
 
-	if err == nil {
-		c.mu.Lock()
-		defer c.mu.Unlock()
-		c.items[key] = seq
-	}
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	c.seqs[key] = seq
+
 }
 
-func makeKey(attrs []Attr) (string, error) {
+func makeKey(attrs []Attr) string {
 	if len(attrs) == 0 {
-		return "", errors.New("empty attribute")
+		return ""
 	}
 
-	intAttrs := make([]int, len(attrs))
+	intAttrs := make([]uint64, len(attrs))
 	buff := make([]byte, 0, len(attrs))
 
 	for i, atrr := range attrs {
-		intAttrs[i] = int(atrr)
+		intAttrs[i] = uint64(atrr)
 	}
 
-	sort.Ints(intAttrs)
+	sort.Slice(intAttrs, func(i, j int) bool {
+		return intAttrs[i] < intAttrs[j]
+	})
 
 	for _, b := range intAttrs {
-		buff = binary.LittleEndian.AppendUint64(buff, uint64(b))
+		buff = binary.LittleEndian.AppendUint64(buff, b)
 	}
 
-	return string(buff), nil
+	return string(buff)
 }

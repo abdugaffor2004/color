@@ -14,42 +14,36 @@ func TestMakeKey(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name:    "empty argument",
-			input:   []Attr{},
-			want:    "",
-			wantErr: true,
+			name:  "empty argument",
+			input: []Attr{},
+			want:  "",
 		},
 		{
-			name:    "single attribute",
-			input:   []Attr{AttrFgRed},
-			want:    string([]byte{1, 0, 0, 0, 0, 0, 0, 0}),
-			wantErr: false,
+			name:  "single attribute",
+			input: []Attr{AttrFgRed},
+			want:  string([]byte{1, 0, 0, 0, 0, 0, 0, 0}),
 		},
 		{
-			name:    "multiple attributes",
-			input:   []Attr{AttrFgRed, AttrFgGreen},
-			want:    string([]byte{1, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0}),
-			wantErr: false,
+			name:  "multiple attributes",
+			input: []Attr{AttrFgRed, AttrFgGreen},
+			want:  string([]byte{1, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0}),
 		},
 		{
-			name:    "larger values",
-			input:   []Attr{256, 65536},
-			want:    string([]byte{0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0}),
-			wantErr: false,
+			name:  "larger values",
+			input: []Attr{256, 65536},
+			want:  string([]byte{0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0}),
+		},
+		{
+			name:  "check sorting",
+			input: []Attr{AttrFgGreen, AttrFgRed},
+			want:  string([]byte{1, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0}),
 		},
 	}
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			result, err := makeKey(tc.input)
-
-			if tc.wantErr {
-				assert.Error(t, err)
-				assert.Equal(t, tc.want, result)
-			} else {
-				assert.NoError(t, err)
-				assert.Equal(t, tc.want, result)
-			}
+			result := makeKey(tc.input)
+			assert.Equal(t, tc.want, result)
 		})
 	}
 }
@@ -66,7 +60,7 @@ func TestCache(t *testing.T) {
 			name:    "Zero attrs",
 			attrs:   []Attr{},
 			seq:     "",
-			isFound: false,
+			isFound: true,
 		},
 		{
 			name:    "one attr",

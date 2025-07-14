@@ -19,6 +19,10 @@ var (
 )
 
 func init() {
+	initialize()
+}
+
+func initialize() {
 	if b, err := strconv.ParseBool(os.Getenv("NO_COLOR")); b && err == nil {
 		NoColor = true
 	}
