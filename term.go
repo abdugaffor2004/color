@@ -3,6 +3,7 @@ package color
 import (
 	"os"
 	"strconv"
+	"strings"
 
 	"golang.org/x/term"
 )
@@ -54,6 +55,17 @@ func SupportsColor() bool {
 
 	if os.Getenv("COLORTERM") != "" {
 		return true
+	}
+
+	colorTerms := []string{
+		"xterm", "xterm-256color", "screen", "tmux",
+		"color", "linux", "cygwin", "putty", "konsole", "gnome",
+	}
+
+	for _, ct := range colorTerms {
+		if strings.Contains(term, ct) {
+			return true
+		}
 	}
 
 	return false
