@@ -50,10 +50,8 @@ func makeAttrSeq(attrs []Attr) string {
 		return ""
 	}
 
-	compacted := slices.Compact(attrs)
-	strAttrs := make([]string, len(compacted))
-
-	for i, attr := range compacted {
+	strAttrs := make([]string, len(attrs))
+	for i, attr := range attrs {
 		strAttrs[i] = strconv.Itoa(ansiCodes[attr])
 	}
 
@@ -64,5 +62,7 @@ func makeAttrSeq(attrs []Attr) string {
 		return a < b
 	})
 
-	return strings.Join(strAttrs, ";")
+	compacted := slices.Compact(strAttrs)
+
+	return strings.Join(compacted, ";")
 }
