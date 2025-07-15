@@ -44,8 +44,8 @@ func makeKey(attrs []Attr) string {
 
 	intAttrs := make([]uint64, len(attrs))
 
-	for i, atrr := range attrs {
-		intAttrs[i] = uint64(atrr)
+	for i, attr := range attrs {
+		intAttrs[i] = uint64(attr)
 	}
 
 	slices.Sort(intAttrs)

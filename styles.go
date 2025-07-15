@@ -42,12 +42,12 @@ func BrightRed(text string) string {
 	return Style(text, AttrFgBrightRed)
 }
 
-// BgRed returns the given text with black background.
+// BgRed returns the given text with red background.
 func BgRed(text string) string {
 	return Style(text, AttrBgRed)
 }
 
-// BgBrightRed returns the given text with bright black background.
+// BgBrightRed returns the given text with bright red background.
 func BgBrightRed(text string) string {
 	return Style(text, AttrBgBrightRed)
 }
@@ -67,12 +67,12 @@ func BrightGreen(text string) string {
 	return Style(text, AttrFgBrightGreen)
 }
 
-// BgGreen returns the given text with black background.
+// BgGreen returns the given text with green background.
 func BgGreen(text string) string {
 	return Style(text, AttrBgGreen)
 }
 
-// BgBrightGreen returns the given text with bright black background.
+// BgBrightGreen returns the given text with bright green background.
 func BgBrightGreen(text string) string {
 	return Style(text, AttrBgBrightGreen)
 }
@@ -92,12 +92,12 @@ func BrightYellow(text string) string {
 	return Style(text, AttrFgBrightYellow)
 }
 
-// BgYellow returns the given text with black background.
+// BgYellow returns the given text with yellow background.
 func BgYellow(text string) string {
 	return Style(text, AttrBgYellow)
 }
 
-// BgBrightYellow returns the given text with bright black background.
+// BgBrightYellow returns the given text with bright yellow background.
 func BgBrightYellow(text string) string {
 	return Style(text, AttrBgBrightYellow)
 }
@@ -117,12 +117,12 @@ func BrightBlue(text string) string {
 	return Style(text, AttrFgBrightBlue)
 }
 
-// BgBlue returns the given text with black background.
+// BgBlue returns the given text with blue background.
 func BgBlue(text string) string {
 	return Style(text, AttrBgBlue)
 }
 
-// BgBrightBlue returns the given text with bright black background.
+// BgBrightBlue returns the given text with bright blue background.
 func BgBrightBlue(text string) string {
 	return Style(text, AttrBgBrightBlue)
 }
@@ -142,12 +142,12 @@ func BrightMagenta(text string) string {
 	return Style(text, AttrFgBrightMagenta)
 }
 
-// BgMagenta returns the given text with black background.
+// BgMagenta returns the given text with magenta background.
 func BgMagenta(text string) string {
 	return Style(text, AttrBgMagenta)
 }
 
-// BgBrightMagenta returns the given text with bright black background.
+// BgBrightMagenta returns the given text with bright magenta background.
 func BgBrightMagenta(text string) string {
 	return Style(text, AttrBgBrightMagenta)
 }
@@ -167,12 +167,12 @@ func BrightCyan(text string) string {
 	return Style(text, AttrFgBrightCyan)
 }
 
-// BgCyan returns the given text with black background.
+// BgCyan returns the given text with cyan background.
 func BgCyan(text string) string {
 	return Style(text, AttrBgCyan)
 }
 
-// BgBrightCyan returns the given text with bright black background.
+// BgBrightCyan returns the given text with bright cyan background.
 func BgBrightCyan(text string) string {
 	return Style(text, AttrBgBrightCyan)
 }
@@ -192,12 +192,12 @@ func BrightWhite(text string) string {
 	return Style(text, AttrFgBrightWhite)
 }
 
-// BgWhite returns the given text with black background.
+// BgWhite returns the given text with white background.
 func BgWhite(text string) string {
 	return Style(text, AttrBgWhite)
 }
 
-// BgBrightWhite returns the given text with bright black background.
+// BgBrightWhite returns the given text with bright white background.
 func BgBrightWhite(text string) string {
 	return Style(text, AttrBgBrightWhite)
 }

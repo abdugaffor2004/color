@@ -89,8 +89,16 @@ func TestStyle(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
+			var want string
+
+			if allowColor() {
+				want = tc.want
+			} else {
+				want = tc.input
+			}
+
 			result := Style(tc.input, tc.attrs...)
-			assert.Equal(t, tc.want, result)
+			assert.Equal(t, want, result)
 		})
 	}
 }
