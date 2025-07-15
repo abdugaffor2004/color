@@ -50,7 +50,7 @@ func makeKey(attrs []Attr) string {
 
 	slices.Sort(intAttrs)
 
-	buf := make([]byte, 0, len(attrs))
+	buf := make([]byte, 0, len(attrs)*8)
 	for _, b := range intAttrs {
 		buf = binary.LittleEndian.AppendUint64(buf, b)
 	}

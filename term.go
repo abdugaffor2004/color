@@ -18,16 +18,23 @@ var (
 	ForceColor bool
 )
 
+var colorTerms = []string{
+	"xterm", "xterm-256color", "screen", "tmux",
+	"color", "linux", "cygwin", "putty", "konsole", "gnome",
+}
+
 func init() {
 	initFlags()
 }
 
 func initFlags() {
-	if b, err := strconv.ParseBool(os.Getenv("NO_COLOR")); b && err == nil {
+	noColor := os.Getenv("NO_COLOR")
+	if b, err := strconv.ParseBool(noColor); b && err == nil {
 		NoColor = true
 	}
 
-	if b, err := strconv.ParseBool(os.Getenv("FORCE_COLOR")); b && err == nil {
+	forceColor := os.Getenv("FORCE_COLOR")
+	if b, err := strconv.ParseBool(forceColor); b && err == nil {
 		ForceColor = true
 	}
 }
@@ -57,13 +64,9 @@ func SupportsColor() bool {
 		return false
 	}
 
-	if os.Getenv("COLORTERM") != "" {
+	colorTerm := os.Getenv("COLORTERM")
+	if colorTerm != "" {
 		return true
-	}
-
-	colorTerms := []string{
-		"xterm", "xterm-256color", "screen", "tmux",
-		"color", "linux", "cygwin", "putty", "konsole", "gnome",
 	}
 
 	return slices.Contains(colorTerms, term)

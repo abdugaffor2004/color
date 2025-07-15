@@ -47,13 +47,13 @@ func TestStyle(t *testing.T) {
 			name:  "Style combining: color + font-style",
 			input: "Важная ошибка",
 			attrs: []Attr{AttrFgRed, AttrBold},
-			want:  "\x1b[31;1mВажная ошибка\x1b[0m",
+			want:  "\x1b[1;31mВажная ошибка\x1b[0m",
 		},
 		{
 			name:  "Style combining: color + font-style + font-decoration",
 			input: "Успех!",
 			attrs: []Attr{AttrFgGreen, AttrBold, AttrUnderline},
-			want:  "\x1b[32;1;4mУспех!\x1b[0m",
+			want:  "\x1b[1;4;32mУспех!\x1b[0m",
 		},
 		{
 			name:  "Style combining: color + bg-Color",
@@ -83,7 +83,7 @@ func TestStyle(t *testing.T) {
 			name:  "Long input",
 			input: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut bibendum sagittis velit, viverra euismod sapien posuere sit amet. Vivamus euismod sed velit nec elementum. Phasellus a gravida nibh. Phasellus rutrum mollis mi, sed hendrerit dolor semper sit amet. Nam et magna id lacus egestas ultrices. Donec dolor justo, ultrices eu ultrices ut, iaculis sit amet mi. Curabitur vel purus ultrices, porta ex eu, luctus mauris. Nullam et nisi viverra, consequat enim id, rhoncus ligula. Ut hendrerit enim vel turpis lacinia eleifend. Integer facilisis aliquam aliquam. Quisque vitae mi imperdiet, tempor turpis sed, pulvinar orci.",
 			attrs: []Attr{AttrBgBlue, AttrFgRed},
-			want:  "\x1b[44;31mLorem ipsum dolor sit amet, consectetur adipiscing elit. Ut bibendum sagittis velit, viverra euismod sapien posuere sit amet. Vivamus euismod sed velit nec elementum. Phasellus a gravida nibh. Phasellus rutrum mollis mi, sed hendrerit dolor semper sit amet. Nam et magna id lacus egestas ultrices. Donec dolor justo, ultrices eu ultrices ut, iaculis sit amet mi. Curabitur vel purus ultrices, porta ex eu, luctus mauris. Nullam et nisi viverra, consequat enim id, rhoncus ligula. Ut hendrerit enim vel turpis lacinia eleifend. Integer facilisis aliquam aliquam. Quisque vitae mi imperdiet, tempor turpis sed, pulvinar orci.\x1b[0m",
+			want:  "\x1b[31;44mLorem ipsum dolor sit amet, consectetur adipiscing elit. Ut bibendum sagittis velit, viverra euismod sapien posuere sit amet. Vivamus euismod sed velit nec elementum. Phasellus a gravida nibh. Phasellus rutrum mollis mi, sed hendrerit dolor semper sit amet. Nam et magna id lacus egestas ultrices. Donec dolor justo, ultrices eu ultrices ut, iaculis sit amet mi. Curabitur vel purus ultrices, porta ex eu, luctus mauris. Nullam et nisi viverra, consequat enim id, rhoncus ligula. Ut hendrerit enim vel turpis lacinia eleifend. Integer facilisis aliquam aliquam. Quisque vitae mi imperdiet, tempor turpis sed, pulvinar orci.\x1b[0m",
 		},
 	}
 
@@ -133,7 +133,7 @@ func TestMakeAttrSeq(t *testing.T) {
 		{
 			name:  "mix attributes and check sorting",
 			input: []Attr{AttrBgBrightCyan, AttrFgBrightRed, AttrUnderline},
-			want:  "106;91;4",
+			want:  "4;91;106",
 		},
 	}
 

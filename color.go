@@ -2,6 +2,7 @@ package color
 
 import (
 	"slices"
+	"sort"
 	"strconv"
 	"strings"
 )
@@ -55,6 +56,13 @@ func makeAttrSeq(attrs []Attr) string {
 	for i, attr := range compacted {
 		strAttrs[i] = strconv.Itoa(ansiCodes[attr])
 	}
+
+	sort.Slice(strAttrs, func(i, j int) bool {
+		a, _ := strconv.Atoi(strAttrs[i])
+		b, _ := strconv.Atoi(strAttrs[j])
+
+		return a < b
+	})
 
 	return strings.Join(strAttrs, ";")
 }
